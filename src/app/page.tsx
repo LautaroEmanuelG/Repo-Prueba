@@ -1,103 +1,91 @@
-import Image from "next/image";
+'use client';
+import { useEffect, useState } from 'react';
+import Header from '../components/Header';
+import SearchBar from '../components/SearchBar';
+import ResourceList from '../components/ResourceList';
+import Calendar from '../components/Calendar';
+import MiniCalendar from '../components/MiniCalendar';
+import WaitingList from '../components/WaitingList';
+import { getRelaciones } from '../services/bitrix24';
+// import { getRelaciones } from '../services/api';
+import { getRelacionesCrest } from '@/services/crest';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [resources] = useState(['Médico 1', 'Médico 2']);
+  const [reservations] = useState([
+    { time: '8:00 - 9:00', resource: 'Médico 1' },
+    { time: '9:00 - 10:00', resource: 'Médico 2' },
+  ]);
+  const [waiting] = useState(['Paciente 1', 'Paciente 2']);
+  const [practices, setPractices] = useState<any[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    // Usar getRelacionesCrest con el método crm.item.list y entityTypeId 1044
+    getRelaciones(1044)
+      .then(data => {
+        console.log('Datos recibidos:', data);
+        setPractices(data);
+      })
+      .catch(error => {
+        console.error('Error al cargar prácticas:', error);
+        setPractices([]);
+      });
+  }, []);
+
+  return (
+    <div>
+      <Header />
+      <div className="grid grid-cols-4 gap-4 p-4">
+        <div className="col-span-1">
+          <SearchBar onSearch={query => console.log(query)} />
+          <ResourceList resources={resources} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className="col-span-2">
+          <Calendar reservations={reservations} />
+          <section className="mt-8">
+            <h2 className="text-lg font-bold mb-4">Prácticas</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse border border-gray-300 text-sm">
+                <thead>
+                  <tr>
+                    <th className="border px-2 py-1">ID</th>
+                    <th className="border px-2 py-1">Nombre</th>
+                    <th className="border px-2 py-1">Tipo</th>
+                    <th className="border px-2 py-1">Precio</th>
+                    <th className="border px-2 py-1">Indicaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {practices.map(practice => (
+                    <tr key={practice.ID}>
+                      <td className="border px-2 py-1">{practice.ID}</td>
+                      <td className="border px-2 py-1">{practice.Nombre}</td>
+                      <td className="border px-2 py-1">{practice.Tipo}</td>
+                      <td className="border px-2 py-1">{practice.Precio}</td>
+                      <td className="border px-2 py-1">
+                        {practice.Indicaciones}
+                      </td>
+                    </tr>
+                  ))}
+                  {practices.length === 0 && (
+                    <tr>
+                      <td
+                        className="border px-2 py-1 text-center"
+                        colSpan={5}>
+                        No hay datos para mostrar.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div className="col-span-1 space-y-4">
+          <MiniCalendar />
+          <WaitingList waiting={waiting} />
+        </div>
+      </div>
     </div>
   );
 }
