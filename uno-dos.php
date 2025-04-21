@@ -11,9 +11,9 @@ if [[ $GITHUB_OUTPUT =~ Hi\ ([^!]+)! ]]; then
     # Configura Git según el usuario detectado
     case "$GITHUB_USER" in
         "LautaroEmanuelG")
-            export GIT_AUTHOR_NAME="Lautaro"
+            export GIT_AUTHOR_NAME="Lautaro Emanuel"
             export GIT_AUTHOR_EMAIL="lgonzalez.sag98@gmail.com"
-            export GIT_COMMITTER_NAME="Lautaro"
+            export GIT_COMMITTER_NAME="Lautaro Emanuel"
             export GIT_COMMITTER_EMAIL="lgonzalez.sag98@gmail.com"
             echo "Usando identidad: Lautaro ($GITHUB_USER)"
             ;;
